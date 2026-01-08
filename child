@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>どうぶつタッチ</title>
+
+<style>
+  body {
+    margin: 0;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #fefefe;
+    text-align: center;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 10px 0;
+  }
+
+  .animals {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .animal {
+    background: #fff;
+    border-radius: 22px;
+    padding: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    cursor: pointer;
+    transition: transform 0.15s ease;
+  }
+
+  .animal:active {
+    transform: scale(0.94);
+  }
+
+  img {
+    width: 100%;
+    border-radius: 18px;
+  }
+
+  .message {
+    font-size: 22px;
+    margin-top: 18px;
+    min-height: 30px;
+  }
+
+  .start-btn {
+    font-size: 22px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    border: none;
+    background: #007aff;
+    color: #fff;
+    width: 100%;
+    margin-top: 30px;
+  }
+</style>
+</head>
+
+<body>
+
+<h1 id="question">どうぶつ どれ？</h1>
+
+<div class="animals" id="animals"></div>
+
+<div class="message" id="message"></div>
+
+<button class="start-btn" onclick="nextQuestion()">つぎ ▶</button>
+
+<!-- 音声 -->
+<audio id="voice"></audio>
+<audio id="okSound" src="ok.mp3"></audio>
+<audio id="ngSound" src="ng.mp3"></audio>
+
+<script>
+const animals = [
+  { name: "いぬ", img: "dog.jpg", voice: "dog.mp3" },
+  { name: "ねこ", img: "cat.jpg", voice: "cat.mp3" },
+  { name: "うし", img: "cow.jpg", voice: "cow.mp3" },
+  { name: "らいおん", img: "lion.jpg", voice: "lion.mp3" }
+];
+
+let correctAnimal = null;
+
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
+
+function speakAnimal(animal) {
+  const voice = document.getElementById("voice");
+  voice.src = animal.voice;
+  voice.play();
+}
+
+function nextQuestion() {
+  document.getElementById("message").innerText = "";
+
+  const shuffled = shuffle([...animals]);
+  correctAnimal = shuffled[0];
+
+  document.getElementById("question").innerText = "どれかな？";
+  speakAnimal(correctAnimal);
+
+  const container = document.getElementById("animals");
+  container.innerHTML = "";
+
+  shuffled.forEach(animal => {
+    const div = document.createElement("div");
+    div.className = "animal";
+    div.innerHTML = `<img src="${animal.img}" alt="${animal.name}">`;
+    div.onclick = () => checkAnswer(animal);
+    container.appendChild(div);
+  });
+}
+
+function checkAnswer(animal) {
+  if (animal.name === correctAnimal.name) {
+    document.getElementById("message").innerText = "すごーい！！🎉";
+    document.getElementById("okSound").play();
+  } else {
+    document.getElementById("message").innerText = "もういっかい 😊";
+    document.getElementById("ngSound").play();
+  }
+}
+
+nextQuestion();
+</script>
+
+</body>
+</html>
