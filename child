@@ -1,136 +1,105 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>どうぶつタッチ</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>どうぶつタッチ</title>
 
-<style>
-  body {
-    margin: 0;
-    padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #fefefe;
-    text-align: center;
-  }
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fff7e6;
+      text-align: center;
+    }
 
-  h1 {
-    font-size: 24px;
-    margin: 10px 0;
-  }
+    h1 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
 
-  .animals {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-top: 20px;
-  }
+    p {
+      font-size: 16px;
+      color: #555;
+    }
 
-  .animal {
-    background: #fff;
-    border-radius: 22px;
-    padding: 10px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
-    cursor: pointer;
-    transition: transform 0.15s ease;
-  }
+    .animals {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
 
-  .animal:active {
-    transform: scale(0.94);
-  }
+    .animal {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 20px;
+      font-size: 40px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      user-select: none;
+      transition: transform 0.1s;
+    }
 
-  img {
-    width: 100%;
-    border-radius: 18px;
-  }
+    .animal:active {
+      transform: scale(0.95);
+    }
 
-  .message {
-    font-size: 22px;
-    margin-top: 18px;
-    min-height: 30px;
-  }
+    .name {
+      font-size: 18px;
+      margin-top: 8px;
+    }
 
-  .start-btn {
-    font-size: 22px;
-    padding: 14px 20px;
-    border-radius: 16px;
-    border: none;
-    background: #007aff;
-    color: #fff;
-    width: 100%;
-    margin-top: 30px;
-  }
-</style>
+    .message {
+      margin-top: 20px;
+      font-size: 22px;
+      color: #ff7a00;
+      min-height: 1.5em;
+    }
+  </style>
 </head>
 
 <body>
+  <h1>どうぶつタッチ 🐾</h1>
+  <p>タッチして なまえを きいてみよう！</p>
 
-<h1 id="question">どうぶつ どれ？</h1>
+  <div class="animals">
+    <div class="animal" onclick="speak('いぬ')">
+      🐶
+      <div class="name">いぬ</div>
+    </div>
 
-<div class="animals" id="animals"></div>
+    <div class="animal" onclick="speak('ねこ')">
+      🐱
+      <div class="name">ねこ</div>
+    </div>
 
-<div class="message" id="message"></div>
+    <div class="animal" onclick="speak('ぞう')">
+      🐘
+      <div class="name">ぞう</div>
+    </div>
 
-<button class="start-btn" onclick="nextQuestion()">つぎ ▶</button>
+    <div class="animal" onclick="speak('うさぎ')">
+      🐰
+      <div class="name">うさぎ</div>
+    </div>
+  </div>
 
-<!-- 音声 -->
-<audio id="voice"></audio>
-<audio id="okSound" src="ok.mp3"></audio>
-<audio id="ngSound" src="ng.mp3"></audio>
+  <div class="message" id="message"></div>
 
-<script>
-const animals = [
-  { name: "いぬ", img: "dog.jpg", voice: "dog.mp3" },
-  { name: "ねこ", img: "cat.jpg", voice: "cat.mp3" },
-  { name: "うし", img: "cow.jpg", voice: "cow.mp3" },
-  { name: "らいおん", img: "lion.jpg", voice: "lion.mp3" }
-];
+  <script>
+    function speak(name) {
+      document.getElementById("message").textContent =
+        name + " だよ！";
 
-let correctAnimal = null;
-
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);
-}
-
-function speakAnimal(animal) {
-  const voice = document.getElementById("voice");
-  voice.src = animal.voice;
-  voice.play();
-}
-
-function nextQuestion() {
-  document.getElementById("message").innerText = "";
-
-  const shuffled = shuffle([...animals]);
-  correctAnimal = shuffled[0];
-
-  document.getElementById("question").innerText = "どれかな？";
-  speakAnimal(correctAnimal);
-
-  const container = document.getElementById("animals");
-  container.innerHTML = "";
-
-  shuffled.forEach(animal => {
-    const div = document.createElement("div");
-    div.className = "animal";
-    div.innerHTML = `<img src="${animal.img}" alt="${animal.name}">`;
-    div.onclick = () => checkAnswer(animal);
-    container.appendChild(div);
-  });
-}
-
-function checkAnswer(animal) {
-  if (animal.name === correctAnimal.name) {
-    document.getElementById("message").innerText = "すごーい！！🎉";
-    document.getElementById("okSound").play();
-  } else {
-    document.getElementById("message").innerText = "もういっかい 😊";
-    document.getElementById("ngSound").play();
-  }
-}
-
-nextQuestion();
-</script>
-
+      if ('speechSynthesis' in window) {
+        const uttr = new SpeechSynthesisUtterance(name + "だよ");
+        uttr.lang = 'ja-JP';
+        speechSynthesis.speak(uttr);
+      }
+    }
+  </script>
 </body>
 </html>
+
